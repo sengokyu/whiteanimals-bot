@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  WhiteAnimalsBot schedule lambda function
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 30
+
+Resources:
+  WhiteAnimalsScheduleFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      Handler: src/handlers/get-and-post.lambdaHandler
+      Runtime: nodejs12.x
+      Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
+        Variables:
+          AWS_REGION: !Ref "AWS::Region"
+      Events:
+        WhiteAnimalsBot:
+          Type: Schedule # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Schedule: rate(1 day)
+
+Outputs:
+  WhiteAnimalsScheduleFunction:
+    Description: "WhiteAnimals bot Lambda Function ARN"
+    Value: !GetAtt WhiteAnimalsScheduleFunction.Arn
+
+  WhiteAnimalsScheduleFunctionIamRole:
+    Description: "Implicit IAM Role created for WhiteAnimals bot schedule function"
+    Value: !GetAtt WhiteAnimalsScheduleFunctionRole.Arn
