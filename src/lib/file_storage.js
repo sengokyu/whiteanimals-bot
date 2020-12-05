@@ -17,12 +17,13 @@ class FileStorage {
     const response = await this._dbx.filesListFolderContinue({
       cursor: cursor,
     });
+    const result = response.result;
 
-    if (response.has_more) {
-      response.entries.concat(await this._listEntriesContinue(response.cursor));
+    if (result.has_more) {
+      result.entries.concat(await this._listEntriesContinue(result.cursor));
     }
 
-    return response.entries;
+    return result.entries;
   }
 
   async _listEntries(path) {
@@ -38,12 +39,13 @@ class FileStorage {
     }
 
     const response = await this._dbx.filesListFolder(params);
+    const result = response.result;
 
-    if (response.has_more) {
-      response.entries.concat(await this._listEntriesContinue(response.cursor));
+    if (result.has_more) {
+      result.entries.concat(await this._listEntriesContinue(result.cursor));
     }
 
-    return response.entries;
+    return result.entries;
   }
 
   _random(max) {
@@ -60,20 +62,23 @@ class FileStorage {
     });
   }
 
-  async pickUrl(path) {
-    const entries = await this._listEntries(path);
+  async _selectRandomOne(entries) {
+    const index = await this._random(entries.length);
+
+    return entries[index].path_lower;
+  }
+
+  async pickUrl(dirPath) {
+    const entries = await this._listEntries(dirPath);
 
     if (entries.length === 0) {
       return null;
     }
 
-    const index = await this._random(entries.length);
+    const path = await this._selectRandomOne(entries);
+    const response = await this._dbx.filesGetTemporaryLink({ path });
 
-    return this._dbx
-      .filesGetTemporaryLink({
-        path: entries[index].path_lower,
-      })
-      .then((result) => result.link);
+    return response.result.link;
   }
 }
 

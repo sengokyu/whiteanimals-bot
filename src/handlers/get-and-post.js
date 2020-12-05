@@ -19,7 +19,11 @@ const retrieveSecrets = function () {
       if (err) {
         reject(err);
       } else {
-        resolv(data);
+        if ("SecretString" in data) {
+          resolv(JSON.parse(data.SecretString));
+        } else {
+          reject(data);
+        }
       }
     });
   });
@@ -60,7 +64,7 @@ const retrieveSecrets = function () {
  *
  */
 exports.lambdaHandler = async (event, context) => {
-  secrets = await retrieveSecrets();
+  const secrets = await retrieveSecrets();
 
   const DbxPath = "";
   const dbx = new Dropbox({
