@@ -1,28 +1,28 @@
-const AWS = require('aws-sdk');
-const Fetch = require('node-fetch');
-const Dropbox = require('dropbox').Dropbox;
-const Twitter = require('twitter');
-const FileStorage = require('../lib/file_storage');
-const fetchWrapper = require('../lib/fetch_wrapper');
-const TwitterMedia = require('../lib/twitter_media');
-const TwitterStatuses = require('../lib/twitter_statuses');
+const AWS = require("aws-sdk");
+const Fetch = require("node-fetch");
+const Dropbox = require("dropbox").Dropbox;
+const Twitter = require("twitter");
+const FileStorage = require("../lib/file_storage");
+const fetchWrapper = require("../lib/fetch_wrapper");
+const TwitterMedia = require("../lib/twitter_media");
+const TwitterStatuses = require("../lib/twitter_statuses");
 const AWS_REGION = process.env.AWS_REGION;
-const SECRET_NAME = 'prod/WhiteAnimalsBot';
+const SECRET_NAME = "prod/WhiteAnimalsBot";
 
-const retrieveSecrets = function() {
-    return new Promise((resolv, reject) => {
-        const client = new AWS.SecretsManager({
-            region: AWS_REGION
-        });
-
-        client.getSecretValue({ SecretId: SECRET_NAME }, (err, data) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolv(data);
-            }
-        });
+const retrieveSecrets = function () {
+  return new Promise((resolv, reject) => {
+    const client = new AWS.SecretsManager({
+      region: AWS_REGION,
     });
+
+    client.getSecretValue({ SecretId: SECRET_NAME }, (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolv(data);
+      }
+    });
+  });
 };
 
 /**
@@ -60,29 +60,29 @@ const retrieveSecrets = function() {
  *
  */
 exports.lambdaHandler = async (event, context) => {
-    secrets = await retrieveSecrets();
+  secrets = await retrieveSecrets();
 
-    const DbxPath = '';
-    const dbx = new Dropbox({
-        accessToken: secrets.DROPBOX_ACCESS_TOKEN,
-        fetch: Fetch
-    });
-    const client = new Twitter({
-        consumer_key: secrets.TWITTER_CONSUMER_KEY,
-        consumer_secret: secrets.TWITTER_CONSUMER_SECRET,
-        access_token_key: secrets.TWITTER_ACCESS_TOKEN_KEY,
-        access_token_secret: secrets.TWITTER_ACCESS_TOKEN_SECRET
-    });
-    const fileStorage = new FileStorage(dbx);
-    const twiMedia = new TwitterMedia(client);
-    const twiStatuses = new TwitterStatuses(client);
+  const DbxPath = "";
+  const dbx = new Dropbox({
+    accessToken: secrets.DROPBOX_ACCESS_TOKEN,
+    fetch: Fetch,
+  });
+  const client = new Twitter({
+    consumer_key: secrets.TWITTER_CONSUMER_KEY,
+    consumer_secret: secrets.TWITTER_CONSUMER_SECRET,
+    access_token_key: secrets.TWITTER_ACCESS_TOKEN_KEY,
+    access_token_secret: secrets.TWITTER_ACCESS_TOKEN_SECRET,
+  });
+  const fileStorage = new FileStorage(dbx);
+  const twiMedia = new TwitterMedia(client);
+  const twiStatuses = new TwitterStatuses(client);
 
-    await fileStorage
-        .pickUrl(DbxPath)
-        .then(url => fetchWrapper(Fetch, url))
-        .then(media => twiMedia.init(media))
-        .then(media => twiMedia.append(media))
-        .then(media => twiMedia.finalize(media))
-        .then(media => twiStatuses.update(media))
-        .catch(console.error);
+  await fileStorage
+    .pickUrl(DbxPath)
+    .then((url) => fetchWrapper(Fetch, url))
+    .then((media) => twiMedia.init(media))
+    .then((media) => twiMedia.append(media))
+    .then((media) => twiMedia.finalize(media))
+    .then((media) => twiStatuses.update(media))
+    .catch(console.error);
 };
