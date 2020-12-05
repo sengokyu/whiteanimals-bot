@@ -1,0 +1,9 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "whiteanimalsbot"
+s3_bucket = "lambdastash"
+s3_prefix = "whiteanimalsbot"
+region = "us-west-1"
+capabilities = "CAPABILITY_IAM"
