@@ -1,14 +1,21 @@
 # whiteanimals-bot
 
-## local development
+## Local development
 
 Invoke function
 
 ```bash
-sam local invoke < /dev/null
+env AWS_REGION=us-west-1 sam local invoke
 ```
 
-## deployment
+## Testing
+
+```bash
+npm test
+```
+
+
+## Deployment
 
 ```bash
 sam package --template-file template.yaml --s3-bucket lambdastash --output-template-file packaged.yaml
