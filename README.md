@@ -5,7 +5,7 @@
 Invoke function
 
 ```bash
-env AWS_REGION=us-west-1 sam local invoke
+npm run invoke
 ```
 
 ## Testing
@@ -18,9 +18,7 @@ npm test
 ## Deployment
 
 ```bash
-sam package --template-file template.yaml --s3-bucket lambdastash --output-template-file packaged.yaml
-
-sam deploy --template-file packaged.yaml --stack-name whiteanimalsbot --capabilities CAPABILITY_IAM
+npm run deploy
 ```
 
 
